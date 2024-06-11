@@ -1,0 +1,17 @@
+{
+  "dependencies": {
+    "js-yaml": "^4.1.0",
+    "steam-user": "^5.0.10"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "3.3.2",
+    "typescript": "^5.4.5"
+  },
+  "scripts": {
+    "start": "node bot.mjs",
+    "test": "eslint bot.mjs"
+  }
+}

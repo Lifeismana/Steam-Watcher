@@ -1,0 +1,14 @@
+extends: 
+  - airbnb-base
+  - eslint-config-prettier
+
+parserOptions:
+  ecmaVersion: latest
+  sourceType: module
+
+env:
+  node: true
+
+rules:
+  indent: [error, tab]
+  no-tabs: off
