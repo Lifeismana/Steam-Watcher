@@ -2,19 +2,12 @@
 
 import SteamUser from "steam-user";
 import fs from "fs/promises";
-import yaml from "js-yaml";
+
+import Config from "./config.mjs";
 
 let client = new SteamUser();
-
-const config = await fs
-    .readFile("config.yaml", "utf8")
-    .then((data) => {
-        return yaml.load(data);
-    })
-    .catch((err) => {
-        console.error(`Is the config file missing? ${err}\n`);
-        process.exit(1);
-    });
+const config = new Config();
+await config.init();
 
 const cache = await fs.readFile("cache.json", "utf8").catch(() => {
     console.info("Cache file not found, creating one");
@@ -28,14 +21,9 @@ client.setOptions({
     changelistUpdateInterval: 10000,
 });
 
-if (config?.steam.username === undefined || config?.steam.password === undefined) {
-    console.error("Please fill in your steam username and password in config.yaml");
-    process.exit(1);
-}
-
 client.logOn({
-    accountName: config.steam.username,
-    password: config.steam.password,
+    accountName: config.data.steam.username,
+    password: config.data.steam.password,
 });
 
 client.on("loggedOn", () => {
@@ -44,7 +32,7 @@ client.on("loggedOn", () => {
 });
 
 client.on("error", (err) => {
-    console.log(err);
+    console.error(err);
 });
 
 client.on("appUpdate", (appid, data) => {
@@ -99,23 +87,3 @@ const sendWebhook = async (config, appid) => {
         console.error(err);
     }
 };
-
-const configWatcher = () => {
-    console.debug("Watching for changes in the config file");
-    fs.watch("config.yaml", { persistent: true }, async () => {
-        console.info("Config file has been updated");
-        const newConfig = await fs
-            .readFile("config.yaml", "utf8")
-            .then((data) => yaml.load(data))
-            .catch((err) => {
-                console.error(`Is the config file valid? ${err}\n`);
-                return;
-            });
-        if (newConfig !== config) {
-            console.info("Updated config loaded");
-            config = newConfig;
-        }
-    });
-};
-
-configWatcher();
