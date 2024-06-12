@@ -50,7 +50,7 @@ client.on("error", (err) => {
 client.on("appUpdate", (appid, data) => {
     console.debug("App " + appid + " has been updated");
     if (config?.apps[appid] === undefined) {
-        console.info("App " + app + " is not being monitored");
+        console.info("App " + appid + " is not being monitored");
         return;
     }
     config.apps[appid].webhooks.forEach((webhook) => {
@@ -73,14 +73,19 @@ const sendWebhook = async (config, appid) => {
                 });
                 break;
             case "github":
-                await fetch(`https://api.github.com/repos/${config.repo}/dispatches`, {
+                const resp = await fetch(`https://api.github.com/repos/${config.repo}/actions/workflows/${config.workflow_id}/dispatches`, {
                     method: "POST",
                     headers: {
                         Accept: "application/vnd.github.everest-preview+json",
                         "Content-Type": "application/json",
                         Authorization: `Bearer ${config.access_token}`,
                     },
+                    body: JSON.stringify({
+                        ref: config.branch || "main",
+                    }),
                 });
+                console.debug(resp);
+                break;
             default:
                 console.log("Unknown webhook type");
         }
@@ -88,3 +93,23 @@ const sendWebhook = async (config, appid) => {
         console.error(err);
     }
 };
+
+const configWatcher = () => {
+    console.debug("Watching for changes in the config file");
+    fs.watch("config.yaml", { persistent: true }, async () => {
+        console.info("Config file has been updated");
+        const newConfig = await fs
+            .readFile("config.yaml", "utf8")
+            .then((data) => yaml.load(data))
+            .catch((err) => {
+                console.error(`Is the config file valid? ${err}\n`);
+                return;
+            });
+        if (newConfig !== config) {
+            console.info("Updated config loaded");
+            config = newConfig;
+        }
+    });
+};
+
+configWatcher();
