@@ -39,7 +39,7 @@ client.on("appUpdate", (appid, data) => {
     console.debug("App " + appid + " has been updated");
     console.debug(data);
     console.debug(data.appinfo.depots.branches.public.buildid);
-    if (config?.apps[appid] === undefined) {
+    if (!config.data?.apps[appid]) {
         console.info("App " + appid + " is not being monitored");
         return;
     }
