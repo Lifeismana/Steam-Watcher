@@ -49,17 +49,23 @@ client.on("error", (err) => {
 
 client.on("appUpdate", (appid, data) => {
     console.debug("App " + appid + " has been updated");
+    console.debug(data);
+    console.debug(data.appinfo.depots.branches.public.buildid);
     if (config?.apps[appid] === undefined) {
         console.info("App " + appid + " is not being monitored");
         return;
     }
-    config.apps[appid].webhooks.forEach((webhook) => {
-        sendWebhook(webhook, appid);
-    });
+    console.debug(data);
+    if (picsCache.app[appid].appinfo.depots.branches.public.buildid === data.appinfo.depots.branches.public.buildid) {
+        config.apps[appid].webhooks.forEach((webhook) => {
+            sendWebhook(webhook, appid);
+        });
+    }
 });
 
 const sendWebhook = async (config, appid) => {
     try {
+        console.debug(config);
         switch (config.type) {
             case "discord":
                 await fetch(config.url, {
