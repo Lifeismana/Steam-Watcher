@@ -3,17 +3,56 @@
 import SteamUser from "steam-user";
 import fs from "fs/promises";
 
-import Config from "./config.mjs";
+import Config from "./config";
 
-let client = new SteamUser();
+const sendWebhook = async (data, appid) => {
+    try {
+        console.debug(data);
+        switch (data.type) {
+            case "discord":
+                await fetch(data.url, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        content: `App ${appid} has been updated`,
+                    }),
+                });
+                break;
+            case "github":
+                console.debug(await fetch(`https://api.github.com/repos/${data.repo}/actions/workflows/${data.workflow_id}/dispatches`, {
+                    method: "POST",
+                    headers: {
+                        Accept: "application/vnd.github.everest-preview+json",
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${data.access_token}`,
+                    },
+                    body: JSON.stringify({
+                        ref: data.branch || "main",
+                    }),
+                }));
+                break;
+            default:
+                console.log("Unknown webhook type");
+        }
+    } catch (err) {
+        console.error(err);
+    }
+};
+
+
+
+const client = new SteamUser();
 const config = new Config();
 await config.init();
 
+// eslint-disable-next-line no-unused-vars
 const cache = await fs.readFile("cache.json", "utf8").catch(() => {
     console.info("Cache file not found, creating one");
-    const cache = { app: {} };
-    fs.writeFile("cache.json", JSON.stringify(cache));
-    return cache;
+    const tmp = { app: {} };
+    fs.writeFile("cache.json", JSON.stringify(tmp));
+    return tmp;
 });
 
 client.setOptions({
@@ -36,11 +75,11 @@ client.on("error", (err) => {
 });
 
 client.on("appUpdate", (appid, data) => {
-    console.debug("App " + appid + " has been updated");
+    console.debug(`App ${  appid  } has been updated`);
     console.debug(data);
     console.debug(data.appinfo.depots?.branches?.public?.buildid);
     if (!config.data?.apps[appid]) {
-        console.info("App " + appid + " is not being monitored");
+        console.info(`App ${  appid  } is not being monitored`);
         return;
     }
     console.debug(data);
@@ -56,39 +95,4 @@ client.on("appUpdate", (appid, data) => {
     }
 });
 
-const sendWebhook = async (config, appid) => {
-    try {
-        console.debug(config);
-        switch (config.type) {
-            case "discord":
-                await fetch(config.url, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        content: `App ${appid} has been updated`,
-                    }),
-                });
-                break;
-            case "github":
-                const resp = await fetch(`https://api.github.com/repos/${config.repo}/actions/workflows/${config.workflow_id}/dispatches`, {
-                    method: "POST",
-                    headers: {
-                        Accept: "application/vnd.github.everest-preview+json",
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${config.access_token}`,
-                    },
-                    body: JSON.stringify({
-                        ref: config.branch || "main",
-                    }),
-                });
-                console.debug(resp);
-                break;
-            default:
-                console.log("Unknown webhook type");
-        }
-    } catch (err) {
-        console.error(err);
-    }
-};
+
