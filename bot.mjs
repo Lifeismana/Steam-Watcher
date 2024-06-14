@@ -67,7 +67,7 @@ const sendWebhook = async (config, appid) => {
                         "Content-Type": "application/json",
                     },
                     body: JSON.stringify({
-                        content: `App ${app} has been updated`,
+                        content: `App ${appid} has been updated`,
                     }),
                 });
                 break;
