@@ -11,7 +11,7 @@
     "typescript": "^5.4.5"
   },
   "scripts": {
-    "start": "node bot.mjs",
-    "test": "eslint bot.mjs"
+    "start": "node src/bot.mjs",
+    "test": "eslint src/*.mjs",
   }
 }
