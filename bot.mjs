@@ -50,7 +50,7 @@ client.on("appUpdate", (appid, data) => {
         data.appinfo?.depots?.branches[config.data.apps[appid].branch || "public"] &&
         client.picsCache.apps[appid].appinfo.depots.branches.public.buildid !== data.appinfo.depots.branches.public.buildid
     ) {
-        config.apps[appid].webhooks.forEach((webhook) => {
+        config.data.apps[appid].webhooks.forEach((webhook) => {
             sendWebhook(webhook, appid);
         });
     }
