@@ -38,12 +38,13 @@ client.on("error", (err) => {
 client.on("appUpdate", (appid, data) => {
     console.debug("App " + appid + " has been updated");
     console.debug(data);
-    console.debug(data.appinfo.depots.branches?.public.buildid);
+    console.debug(data.appinfo.depots?.branches?.public?.buildid);
     if (!config.data?.apps[appid]) {
         console.info("App " + appid + " is not being monitored");
         return;
     }
     console.debug(data);
+    console.debug(client.picsCache.apps[appid]);
     if (
         client.picsCache.apps[appid]?.appinfo?.depots?.branches[config.data.apps[appid].branch || "public"] &&
         data.appinfo?.depots?.branches[config.data.apps[appid].branch || "public"] &&
