@@ -3,7 +3,7 @@
 import SteamUser from "steam-user";
 import fs from "fs/promises";
 
-import Config from "./config";
+import Config from "./config.mjs";
 
 const sendWebhook = async (data, appid) => {
     try {
