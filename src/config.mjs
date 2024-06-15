@@ -1,7 +1,7 @@
 import fs from "fs/promises";
 import yaml from "js-yaml";
 
-const CONFIG_FILE = "config.yaml";
+const CONFIG_FILE = "config/config.yaml";
 
 export default class Config {
     constructor() {
@@ -22,7 +22,7 @@ export default class Config {
         console.debug("Watching for changes in the config file");
         try {
             const watcher = fs.watch(CONFIG_FILE, { persistent: true });
-            // eslint-disable-next-line no-restricted-syntax
+            // eslint-disable-next-line no-restricted-syntax , no-unused-vars
             for await (const _ of watcher) {
                 console.debug("Config file has been updated");
                 const newConfig = await fs
@@ -48,9 +48,9 @@ export default class Config {
                 process.exit(1);
             }
             return true;
-        } catch(err) {
+        } catch (err) {
             console.error(`Is the config file valid? ${err}\n`);
             return false;
-        };
+        }
     }
 }
