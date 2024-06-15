@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
 import SteamUser from "steam-user";
-import fs from "fs/promises";
 
 import Config from "./config.mjs";
+import Cache from "./cache.mjs";
 
 const sendWebhook = async (data, appid) => {
     try {
@@ -41,19 +41,11 @@ const sendWebhook = async (data, appid) => {
     }
 };
 
-
-
 const client = new SteamUser();
 const config = new Config();
 await config.init();
-
-// eslint-disable-next-line no-unused-vars
-const cache = await fs.readFile("cache.json", "utf8").catch(() => {
-    console.info("Cache file not found, creating one");
-    const tmp = { app: {} };
-    fs.writeFile("cache.json", JSON.stringify(tmp));
-    return tmp;
-});
+const cache = new Cache();
+await cache.init();
 
 client.setOptions({
     enablePicsCache: true,
@@ -85,9 +77,10 @@ client.on("appUpdate", (appid, data) => {
     console.debug(data);
     console.debug(client.picsCache.apps[appid]);
     if (
-        client.picsCache.apps[appid]?.appinfo?.depots?.branches[config.data.apps[appid].branch || "public"] &&
-        data.appinfo?.depots?.branches[config.data.apps[appid].branch || "public"] &&
-        client.picsCache.apps[appid].appinfo.depots.branches.public.buildid !== data.appinfo.depots.branches.public.buildid
+        (client.picsCache.apps[appid]?.appinfo?.depots?.branches[config.data.apps[appid].branch || "public"] &&
+            data.appinfo?.depots?.branches[config.data.apps[appid].branch || "public"] &&
+            client.picsCache.apps[appid].appinfo.depots.branches.public.buildid !== data.appinfo.depots.branches.public.buildid) ||
+        cache.is_buildid_updated(appid, data.appinfo.depots.branches.public.buildid)
     ) {
         config.data.apps[appid].webhooks.forEach((webhook) => {
             sendWebhook(webhook, appid);
