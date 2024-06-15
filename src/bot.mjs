@@ -21,17 +21,19 @@ const sendWebhook = async (data, appid) => {
                 });
                 break;
             case "github":
-                console.debug(await fetch(`https://api.github.com/repos/${data.repo}/actions/workflows/${data.workflow_id}/dispatches`, {
-                    method: "POST",
-                    headers: {
-                        Accept: "application/vnd.github.everest-preview+json",
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${data.access_token}`,
-                    },
-                    body: JSON.stringify({
-                        ref: data.branch || "main",
+                console.debug(
+                    await fetch(`https://api.github.com/repos/${data.repo}/actions/workflows/${data.workflow_id}/dispatches`, {
+                        method: "POST",
+                        headers: {
+                            Accept: "application/vnd.github.everest-preview+json",
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${data.access_token}`,
+                        },
+                        body: JSON.stringify({
+                            ref: data.branch || "main",
+                        }),
                     }),
-                }));
+                );
                 break;
             default:
                 console.log("Unknown webhook type");
@@ -67,15 +69,11 @@ client.on("error", (err) => {
 });
 
 client.on("appUpdate", (appid, data) => {
-    console.debug(`App ${  appid  } has been updated`);
-    console.debug(data);
-    console.debug(data.appinfo.depots?.branches?.public?.buildid);
+    console.info(`App ${appid} has been updated`);
     if (!config.data?.apps[appid]) {
-        console.info(`App ${  appid  } is not being monitored`);
+        console.info(`App ${appid} is not being monitored`);
         return;
     }
-    console.debug(data);
-    console.debug(client.picsCache.apps[appid]);
     if (
         (client.picsCache.apps[appid]?.appinfo?.depots?.branches[config.data.apps[appid].branch || "public"] &&
             data.appinfo?.depots?.branches[config.data.apps[appid].branch || "public"] &&
@@ -87,5 +85,3 @@ client.on("appUpdate", (appid, data) => {
         });
     }
 });
-
-
