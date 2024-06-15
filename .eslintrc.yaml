@@ -13,6 +13,4 @@ rules:
 #  indent: [error, tab]
 #  no-tabs: off
   no-console: off
-  no-unused-vars: 
-    - error
-    - { vars: all, args: after-used, ignoreRestSiblings: true, ignorePattern: '^_' }
+  import/extensions: off
