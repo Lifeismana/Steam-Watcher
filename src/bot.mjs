@@ -76,10 +76,10 @@ client.on("appUpdate", (appid, data) => {
         return;
     }
     if (
+        cache.is_buildid_updated(appid, data.appinfo.depots.branches[config.data.apps[appid].branch || "public"].buildid) ||
         (client.picsCache.apps[appid]?.appinfo?.depots?.branches[config.data.apps[appid].branch || "public"] &&
             data.appinfo?.depots?.branches[config.data.apps[appid].branch || "public"] &&
-            client.picsCache.apps[appid].appinfo.depots.branches.public.buildid !== data.appinfo.depots.branches.public.buildid) ||
-        cache.is_buildid_updated(appid, data.appinfo.depots.branches.public.buildid)
+            client.picsCache.apps[appid].appinfo.depots.branches.public.buildid !== data.appinfo.depots.branches.public.buildid)
     ) {
         config.data.apps[appid].webhooks.forEach((webhook) => {
             sendWebhook(webhook, appid);
