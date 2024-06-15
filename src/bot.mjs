@@ -52,6 +52,7 @@ await cache.init();
 client.setOptions({
     enablePicsCache: true,
     changelistUpdateInterval: 10000,
+    machineIdType: SteamUser.EMachineIDType.PersistentRandom,
 });
 
 client.logOn({
