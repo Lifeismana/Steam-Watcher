@@ -53,4 +53,9 @@ export default class Config {
             return false;
         }
     }
+
+    // returns the branch configured for the given appid or the default branch
+    getBranch(appid) {
+        return this.data.apps[appid]?.branch || "public";
+    }
 }
