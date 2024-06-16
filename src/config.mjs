@@ -62,7 +62,7 @@ export default class Config {
     }
 
     getApp(appid) {
-        if (appid){
+        if (appid) {
             if (!this.#data.apps[appid]) {
                 return null;
             }
@@ -75,6 +75,6 @@ export default class Config {
         return {
             accountName: this.#data?.steam?.username,
             password: this.#data?.steam?.password,
-        }
+        };
     }
 }

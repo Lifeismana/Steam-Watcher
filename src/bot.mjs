@@ -57,12 +57,35 @@ client.setOptions({
 
 client.logOn(config.getSteamLogins());
 
-
-
+const initAfterLogin = async () => {
+    Object.keys(config.getApp()).forEach(async (appid) => {
+        // for some reason getProductInfo only times out
+        // hopefully waiting 30s after boot is enough to make picsCache never be empty
+        // if (!client.picsCache.apps[appid]) {
+        //     console.debug("Product info fetching");
+        //     await client.getProductInfo([appid], []);
+        //     console.debug("Product info fetched");
+        // }
+        if (!client.picsCache.apps[appid]?.appinfo) {
+            console.info(`App ${appid} is not available`);
+            return;
+        }
+        if (!client.picsCache.apps[appid].appinfo?.depots?.branches[config.getBranch(appid)]) {
+            console.info(`Branch ${config.getBranch(appid)} is not available for app ${appid}`);
+            return;
+        }
+        if (cache.is_buildid_updated(appid, client.picsCache.apps[appid].appinfo.depots.branches[config.getBranch(appid)].buildid)) {
+            config.getApp(appid)?.webhooks.forEach((webhook) => {
+                sendWebhook(webhook, appid);
+            });
+        }
+    });
+};
 
 client.on("loggedOn", () => {
     console.info("Logged into Steam");
     client.setPersona(SteamUser.EPersonaState.Online);
+    setTimeout(initAfterLogin, 30000);
 });
 
 client.on("error", (err) => {
