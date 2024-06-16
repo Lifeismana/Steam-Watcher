@@ -13,10 +13,10 @@ await cache.init();
 
 const sendWebhook = async (data, appid) => {
     try {
-        console.debug(data);
+        let response;
         switch (data.type) {
             case "discord":
-                await fetch(data.url, {
+                response = await fetch(data.url, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -27,22 +27,23 @@ const sendWebhook = async (data, appid) => {
                 });
                 break;
             case "github":
-                console.debug(
-                    await fetch(`https://api.github.com/repos/${data.repo}/actions/workflows/${data.workflow_id}/dispatches`, {
-                        method: "POST",
-                        headers: {
-                            Accept: "application/vnd.github.everest-preview+json",
-                            "Content-Type": "application/json",
-                            Authorization: `Bearer ${data.access_token}`,
-                        },
-                        body: JSON.stringify({
-                            ref: data.branch || "main",
-                        }),
+                response = await fetch(`https://api.github.com/repos/${data.repo}/actions/workflows/${data.workflow_id}/dispatches`, {
+                    method: "POST",
+                    headers: {
+                        Accept: "application/vnd.github.everest-preview+json",
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${data.access_token}`,
+                    },
+                    body: JSON.stringify({
+                        ref: data.branch || "main",
                     }),
-                );
+                });
                 break;
             default:
                 console.log("Unknown webhook type");
+        }
+        if (response.status < 200 || response.status >= 300) {
+            console.error(`Failed to send webhook: ${response.status} ${response.statusText} ${response.url}`);
         }
     } catch (err) {
         console.error(err);
