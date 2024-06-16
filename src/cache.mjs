@@ -30,6 +30,9 @@ export default class Cache {
     }
 
     is_buildid_updated(appid, buildid) {
+        if (!this.data.apps[appid]) {
+            this.data.apps[appid] = {};
+        }
         if (!this.data.apps[appid].buildid || this.data.apps[appid].buildid !== buildid) {
             this.data.apps[appid].buildid = buildid;
             this.#write();
