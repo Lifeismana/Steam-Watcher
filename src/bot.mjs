@@ -55,10 +55,10 @@ client.setOptions({
     machineIdType: SteamUser.EMachineIDType.PersistentRandom,
 });
 
-client.logOn({
-    accountName: config.data.steam.username,
-    password: config.data.steam.password,
-});
+client.logOn(config.getSteamLogins());
+
+
+
 
 client.on("loggedOn", () => {
     console.info("Logged into Steam");
@@ -71,7 +71,7 @@ client.on("error", (err) => {
 
 client.on("appUpdate", (appid, data) => {
     console.info(`App ${appid} has been updated`);
-    if (!config.data?.apps[appid]) {
+    if (!config.getApp(appid)) {
         console.info(`App ${appid} is not being monitored`);
         return;
     }
@@ -81,7 +81,7 @@ client.on("appUpdate", (appid, data) => {
             data.appinfo?.depots?.branches[config.getBranch(appid)] &&
             client.picsCache.apps[appid].appinfo.depots.branches.public.buildid !== data.appinfo.depots.branches.public.buildid)
     ) {
-        config.data.apps[appid].webhooks.forEach((webhook) => {
+        config.getApp(appid)?.webhooks.forEach((webhook) => {
             sendWebhook(webhook, appid);
         });
     }
