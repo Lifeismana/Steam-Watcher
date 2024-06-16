@@ -5,6 +5,12 @@ import SteamUser from "steam-user";
 import Config from "./config.mjs";
 import Cache from "./cache.mjs";
 
+const client = new SteamUser();
+const config = new Config();
+await config.init();
+const cache = new Cache();
+await cache.init();
+
 const sendWebhook = async (data, appid) => {
     try {
         console.debug(data);
@@ -42,12 +48,6 @@ const sendWebhook = async (data, appid) => {
         console.error(err);
     }
 };
-
-const client = new SteamUser();
-const config = new Config();
-await config.init();
-const cache = new Cache();
-await cache.init();
 
 client.setOptions({
     enablePicsCache: true,
