@@ -1,17 +1,13 @@
 {
-  "dependencies": {
-    "js-yaml": "^4.1.0",
-    "steam-user": "^5.0.10"
-  },
-  "devDependencies": {
-    "eslint": "^8.57.0",
-    "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-config-prettier": "^9.1.0",
-    "prettier": "3.3.3",
-    "typescript": "^5.4.5"
-  },
-  "scripts": {
-    "start": "node src/bot.mjs",
-    "test": "eslint src/*.mjs"
-  }
+	"dependencies": {
+		"js-yaml": "^4.1.0",
+		"steam-user": "^5.0.10"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "1.9.4"
+	},
+	"scripts": {
+		"start": "node src/bot.mjs",
+		"test": "eslint src/*.mjs"
+	}
 }

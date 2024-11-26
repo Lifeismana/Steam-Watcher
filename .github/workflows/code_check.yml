@@ -7,7 +7,5 @@ jobs:
             - uses: actions/checkout@v4
             - name: Install modules
               run: npm ci
-            - name: Run ESLint
-              run: npx eslint src --ext .mjs
-            - name: Run Prettier
-              run: npx prettier --check .
+            - name: Run Biome
+              run: npx biome check .
