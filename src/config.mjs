@@ -16,6 +16,10 @@ export default class Config {
 			this.verify();
 		} catch (err) {
 			console.error(err);
+			if (err.code === "ENOENT") {
+				console.error(`Config file not found, it should be under ${CONFIG_FILE}`);
+				process.exit(1);
+			}
 		}
 		this.#watch();
 	}
