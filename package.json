@@ -4,7 +4,7 @@
     "steam-user": "^5.0.10"
   },
   "devDependencies": {
-    "eslint": "^8.57.0",
+    "eslint": "^9.0.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^9.1.0",
     "prettier": "3.3.3",
