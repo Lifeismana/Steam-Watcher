@@ -11,31 +11,41 @@ await config.init();
 const cache = new Cache();
 await cache.init();
 
-const sendWebhook = async (data, appid) => {
+const sendWebhook = async (webhook, appid) => {
 	try {
 		let response;
-		switch (data.type) {
+		switch (webhook.type) {
 			case "discord":
-				response = await fetch(data.url, {
+				response = await fetch(webhook.url, {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
 					},
 					body: JSON.stringify({
-						content: `App ${appid} has been updated`,
+						embeds: [
+							{
+								title: `App ${appid} has been updated`,
+								url: `https://steamdb.info/app/${appid}/`,
+								description: `App ${appid} has been updated`,
+								color: 0x00ff00,
+							},
+						],
+						allowed_mentions: {
+							parse: [],
+						},
 					}),
 				});
 				break;
 			case "github":
-				response = await fetch(`https://api.github.com/repos/${data.repo}/actions/workflows/${data.workflow_id}/dispatches`, {
+				response = await fetch(`https://api.github.com/repos/${webhook.repo}/actions/workflows/${webhook.workflow_id}/dispatches`, {
 					method: "POST",
 					headers: {
 						Accept: "application/vnd.github.everest-preview+json",
 						"Content-Type": "application/json",
-						Authorization: `Bearer ${data.access_token}`,
+						Authorization: `Bearer ${webhook.access_token}`,
 					},
 					body: JSON.stringify({
-						ref: data.branch || "main",
+						ref: webhook.branch || "main",
 					}),
 				});
 				break;
