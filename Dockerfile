@@ -5,7 +5,7 @@ RUN npm ci
 # Copy the the files you need
 COPY src/* ./
 
-FROM alpine:3.20
+FROM alpine:3.21
 # Create app directory
 WORKDIR /usr/src/app
 # Add required binaries
