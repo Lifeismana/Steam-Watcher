@@ -65,13 +65,10 @@ export default class Config {
 	}
 
 	getApp(appid) {
-		if (appid) {
-			if (!this.#data.apps[appid]) {
-				return null;
-			}
-			return this.#data.apps[appid];
+		if (appid !== undefined) {
+			return this.#data.apps?.[appid] || null;
 		}
-		return this.#data.apps;
+		return this.#data.apps || {};
 	}
 
 	getSteamLogins() {

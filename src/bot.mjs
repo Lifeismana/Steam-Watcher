@@ -52,7 +52,7 @@ const sendWebhook = async (webhook, appid) => {
 			default:
 				console.log("Unknown webhook type");
 		}
-		if (response.status < 200 || response.status >= 300) {
+		if (response && !response.ok) {
 			console.error(`Failed to send webhook: ${response.status} ${response.statusText} ${response.url}`);
 		}
 	} catch (err) {
@@ -81,11 +81,13 @@ const initAfterLogin = async () => {
 			console.info(`App ${appid} is not available`);
 			return;
 		}
-		if (!client.picsCache.apps[appid].appinfo?.depots?.branches[config.getBranch(appid)]) {
-			console.info(`Branch ${config.getBranch(appid)} is not available for app ${appid}`);
+		const branch = config.getBranch(appid);
+		const branchData = client.picsCache.apps[appid].appinfo.depots?.branches?.[branch];
+		if (!branchData) {
+			console.info(`Branch ${branch} is not available for app ${appid}`);
 			return;
 		}
-		if (cache.is_buildid_updated(appid, client.picsCache.apps[appid].appinfo.depots.branches[config.getBranch(appid)].buildid)) {
+		if (cache.is_buildid_updated(appid, branchData.buildid)) {
 			config.getApp(appid)?.webhooks.forEach((webhook) => {
 				sendWebhook(webhook, appid);
 			});
@@ -109,13 +111,16 @@ client.on("appUpdate", (appid, data) => {
 		console.info(`App ${appid} is not being monitored`);
 		return;
 	}
+
+	const branch = config.getBranch(appid);
+	const newBranchData = data?.appinfo?.depots?.branches?.[branch];
+	const oldBranchData = client.picsCache.apps[appid]?.appinfo?.depots?.branches?.[branch];
+
 	if (
-		cache.is_buildid_updated(appid, data.appinfo.depots.branches[config.getBranch(appid)].buildid) ||
-		(client.picsCache.apps[appid]?.appinfo?.depots?.branches[config.getBranch(appid)] &&
-			data.appinfo?.depots?.branches[config.getBranch(appid)] &&
-			client.picsCache.apps[appid].appinfo.depots.branches.public.buildid !== data.appinfo.depots.branches.public.buildid)
+		(newBranchData && cache.is_buildid_updated(appid, newBranchData.buildid)) ||
+		(oldBranchData && newBranchData && oldBranchData.buildid !== newBranchData.buildid)
 	) {
-		config.getApp(appid)?.webhooks.forEach((webhook) => {
+		config.getApp(appid)?.webhooks?.forEach((webhook) => {
 			sendWebhook(webhook, appid);
 		});
 	}
